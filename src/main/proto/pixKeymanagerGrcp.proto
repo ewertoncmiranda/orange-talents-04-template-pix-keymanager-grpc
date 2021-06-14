@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "miranda.kmanage.grpc.zup";
+option java_outer_classname = "PixKeymanagerGrcp";
+option objc_class_prefix = "HLW";
+
+package miranda.kmanage.grpc.zup;
+
+service PixKeymanagerGrcpService {
+  rpc send (PixKeymanagerGrcpRequest) returns (PixKeymanagerGrcpReply) {}
+}
+
+message PixKeymanagerGrcpRequest {
+  string name = 1;
+}
+
+message PixKeymanagerGrcpReply {
+  string message = 1;
+}

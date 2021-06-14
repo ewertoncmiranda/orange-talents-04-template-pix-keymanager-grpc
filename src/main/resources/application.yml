@@ -1,0 +1,12 @@
+micronaut:
+  application:
+    name: pixKeymanagerGrcp
+datasources:
+  default:
+    url: jdbc:mysql://localhost:3306/keymanager_grpc?createDatabaseIfNotExist=true&useTimezone=true&serverTimezone=UTC
+    driverClassName: com.mysql.cj.jdbc.Driver
+    username: root
+    password: root
+    schema-generate: CREATE_DROP
+    dialect: MYSQL
+jpa.default.properties.hibernate.hbm2ddl.auto: update
