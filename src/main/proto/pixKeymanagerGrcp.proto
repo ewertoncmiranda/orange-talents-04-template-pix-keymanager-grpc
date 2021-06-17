@@ -7,14 +7,31 @@ option objc_class_prefix = "HLW";
 
 package miranda.kmanage.grpc.zup;
 
-service PixKeymanagerGrcpService {
-  rpc send (PixKeymanagerGrcpRequest) returns (PixKeymanagerGrcpReply) {}
+service PixKeymanagerService {
+  rpc cadastra (NovaChaveRequester) returns (NovaChaveResponse) {}
 }
 
-message PixKeymanagerGrcpRequest {
-  string name = 1;
+message NovaChaveRequester{
+  string iDcliente = 1 ;
+  TipoConta tipoConta = 2  ;
+  TipoChave tipoChave = 3 ;
+  string chave = 4 ;
+}
+message NovaChaveResponse {
+  string idPix = 1;
+  string clienteId = 2 ;
 }
 
-message PixKeymanagerGrcpReply {
-  string message = 1;
+enum TipoChave {
+  UNKNOWN= 0;
+  CPF = 1;
+  CELULAR = 2;
+  EMAIL = 3;
+  ALEATORIO = 4;
+}
+
+enum TipoConta{
+  NULA = 0 ;
+  CONTA_CORRENTE = 1;
+  CONTA_POUPANCA = 2 ;
 }
