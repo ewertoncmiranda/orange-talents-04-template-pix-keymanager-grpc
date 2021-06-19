@@ -11,5 +11,5 @@ import miranda.kmanage.grpc.zup.sistemasexternos.datatransfermodel.ContaCompleta
 open interface ItauBaseDeDados {
 
     @Get("/api/v1/clientes/{idCliente}/contas{?tipo}")
-    fun buscarCLientePorId (@PathVariable idCliente:String,@QueryValue tipo:String): HttpResponse<ContaCompletaResponse>
+    fun buscarCLientePorIdEConta (@PathVariable idCliente:String, @QueryValue tipo:String): HttpResponse<ContaCompletaResponse>
 }

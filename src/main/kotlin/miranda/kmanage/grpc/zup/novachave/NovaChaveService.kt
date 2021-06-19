@@ -1,5 +1,6 @@
 package miranda.kmanage.grpc.zup.novachave
 
+import io.micronaut.http.HttpStatus
 import io.micronaut.validation.Validated
 import miranda.kmanage.grpc.zup.NovaChaveResponse
 import miranda.kmanage.grpc.zup.chavepix.ChavePixRepositorio
@@ -22,19 +23,19 @@ class NovaChaveService(
 
     @Transactional
     fun cadastrar(@Valid novaChavePix: NovaChavePix): NovaChaveResponse{
+        //verifica o tipo da chave e atribui uma string para passar como parametro para o cliente
+        val tipoConta = verificaConta(novaChavePix.conta!!)
 
-        val tipoConta = when(novaChavePix.conta){
-            TipoDaConta.CONTA_POUPANCA -> "CONTA_POUPANCA"
-            TipoDaConta.CONTA_CORRENTE->"CONTA_CORRENTE"
-            else -> ""
-        }
+        //verifica no repositório se a chave já é cadastrada. Se sim, lança uma exceção
         if(chavePixRepositorio.existsByChave(novaChavePix.chave!!)) throw ChaveExistenteException("Chave ${novaChavePix.chave}Já cadastrada")
 
+        //Busca no cliente erp do Itau um idCliente e um tipo de conta
+        val response = baseDeDados.buscarCLientePorIdEConta(novaChavePix.clienteId!!,tipoConta)
 
-        val response = baseDeDados.buscarCLientePorId(novaChavePix.clienteId!!,tipoConta)
+        //verifica se o cliente foi encontrado
+        if(response.status.code == HttpStatus.NOT_FOUND.code) { throw ClienteNaoCadastradoNoBancoException("Cliente não encontrado no banco.")}
 
-        val conta = response.body()?.toModel() ?: throw ClienteNaoCadastradoNoBancoException("Cliente não encontrado no banco.")
-
+        val conta = response.body()?.toModel()
 
         var chavepix = novaChavePix.toModel()
         //Converte contaResponse para conta, salva conta e atribui o objeto de conta retornado
@@ -47,5 +48,13 @@ class NovaChaveService(
                                 .setClienteId(chaveSalva.clientId)
                                 .setIdPix(chaveSalva.chave)
                                 .build()
+    }
+
+    fun verificaConta(conta: TipoDaConta):String{
+        return when(conta){
+            TipoDaConta.CONTA_POUPANCA -> "CONTA_POUPANCA"
+            TipoDaConta.CONTA_CORRENTE->"CONTA_CORRENTE"
+            else -> "-----ERRO---------"
+        }
     }
 }
