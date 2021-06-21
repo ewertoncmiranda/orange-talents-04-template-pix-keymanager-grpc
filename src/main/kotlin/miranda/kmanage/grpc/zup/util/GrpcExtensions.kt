@@ -1,8 +1,10 @@
 package miranda.kmanage.grpc.zup.uti
 
+import miranda.kmanage.grpc.zup.DeletaChaveRequester
 import miranda.kmanage.grpc.zup.NovaChaveRequester
 import miranda.kmanage.grpc.zup.TipoChave
 import miranda.kmanage.grpc.zup.TipoConta
+import miranda.kmanage.grpc.zup.deletarchave.SolicitaDeleteChave
 import miranda.kmanage.grpc.zup.enum.TipoDaConta
 import miranda.kmanage.grpc.zup.enum.TipoDeChave
 import miranda.kmanage.grpc.zup.novachave.NovaChavePix
@@ -25,4 +27,8 @@ fun NovaChaveRequester.toModel(): NovaChavePix {
         }
 
     )
+}
+
+fun DeletaChaveRequester.toModel(): SolicitaDeleteChave {
+     return SolicitaDeleteChave(idPix ,clienteId)
 }

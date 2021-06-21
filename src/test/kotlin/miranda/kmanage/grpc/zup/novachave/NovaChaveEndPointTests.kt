@@ -17,7 +17,6 @@ import miranda.kmanage.grpc.zup.conta.ContaDoBanco
 import miranda.kmanage.grpc.zup.conta.ContaDoBancoRepositorio
 import miranda.kmanage.grpc.zup.enum.TipoDaConta
 import miranda.kmanage.grpc.zup.enum.TipoDeChave
-import miranda.kmanage.grpc.zup.exception.ChaveExistenteException
 import miranda.kmanage.grpc.zup.sistemasexternos.ItauBaseDeDados
 import miranda.kmanage.grpc.zup.sistemasexternos.datatransfermodel.ContaCompletaResponse
 import miranda.kmanage.grpc.zup.sistemasexternos.datatransfermodel.InstituicaoResponse
@@ -31,7 +30,7 @@ import java.util.*
 import javax.inject.Inject
 
 @MicronautTest(transactional = false)
-internal class NovaChaveTests(
+internal class NovaChaveEndPointTests(
     val clienteGrpc:PixKeymanagerServiceGrpc.PixKeymanagerServiceBlockingStub,
     val repositorio:ChavePixRepositorio,
     val contaDoBancoRepositorio: ContaDoBancoRepositorio) {
@@ -90,6 +89,7 @@ internal class NovaChaveTests(
           }
         Assertions.assertEquals(Status.ALREADY_EXISTS.code , error.status.code)
     }
+
     @Test
     fun nao_deve_registrar_chave_com_valor_diferente_do_tipo(){
         repositorio.save(novaChavePix())
@@ -105,6 +105,7 @@ internal class NovaChaveTests(
         }
         Assertions.assertEquals(Status.INVALID_ARGUMENT.code , error.status.code)
     }
+
     @Test
     fun nao_deve_registrar_chave_quando_conta_nao_encontrada(){
 
@@ -137,7 +138,7 @@ internal class NovaChaveTests(
        return chave;
     }
 
-    //Objeto populado de NovaChaveRequester
+
     @Factory
     class Clients {
         @Bean

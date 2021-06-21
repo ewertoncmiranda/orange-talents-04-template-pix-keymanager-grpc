@@ -11,6 +11,11 @@ service PixKeymanagerService {
   rpc cadastra (NovaChaveRequester) returns (NovaChaveResponse) {}
 }
 
+service DeletarChaveService{
+  rpc exclui(DeletaChaveRequester) returns (DeletaChaveResponse){}
+}
+
+
 message NovaChaveRequester{
   string iDcliente = 1 ;
   TipoConta tipoConta = 2  ;
@@ -21,6 +26,17 @@ message NovaChaveResponse {
   string idPix = 1;
   string clienteId = 2 ;
 }
+
+message DeletaChaveResponse{
+bool deletado = 1 ;
+}
+
+message DeletaChaveRequester{
+int64  idPix = 1;
+string clienteId=2;
+}
+
+
 
 enum TipoChave {
   UNKNOWN= 0;

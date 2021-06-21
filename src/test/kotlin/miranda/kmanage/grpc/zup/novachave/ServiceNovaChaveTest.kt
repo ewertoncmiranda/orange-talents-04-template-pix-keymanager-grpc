@@ -27,11 +27,12 @@ internal class ServiceNovaChaveTest(val service: NovaChaveService,val contaDoBan
 
     @Test
     fun deve_retornar_string_tipo_conta(){
-       service.verificaConta(TipoDaConta.CONTA_CORRENTE).let{
+       service.verificaTipoDaConta(TipoDaConta.CONTA_CORRENTE).let{
            assertEquals("CONTA_CORRENTE",it);
-           Assertions.assertNotNull(it)
+           assertNotNull(it)
        }
     }
+
 
     @Test
     fun deve_retornar_nova_chave_response() {
@@ -45,11 +46,10 @@ internal class ServiceNovaChaveTest(val service: NovaChaveService,val contaDoBan
 
         val response = service.cadastrar(novaChavePix())
 
-        Assertions.assertNotNull(response)
+        assertNotNull(response)
         Assertions.assertEquals(NovaChaveResponse::class.java,response::class.java)
     }
 
-    //funcao retornando NovaChavePix
     fun novaChavePix(): NovaChavePix {
         return NovaChavePix(
             "bc35591d-b547-4151-a325-4a9d2cd19614",
@@ -59,7 +59,6 @@ internal class ServiceNovaChaveTest(val service: NovaChaveService,val contaDoBan
         )
     }
 
-    //Mockfdo ItauBaseDeDados
     @MockBean(ItauBaseDeDados::class)
     fun mockItauBaseDeDados(): ItauBaseDeDados?{
         return Mockito.mock(ItauBaseDeDados::class.java)

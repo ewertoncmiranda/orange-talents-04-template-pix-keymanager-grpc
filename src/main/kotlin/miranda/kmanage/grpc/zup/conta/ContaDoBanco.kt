@@ -1,5 +1,6 @@
 package miranda.kmanage.grpc.zup.conta
 
+import miranda.kmanage.grpc.zup.chavepix.ChavePix
 import miranda.kmanage.grpc.zup.enum.TipoDaConta
 import java.time.LocalDateTime
 import javax.persistence.*
@@ -13,8 +14,12 @@ class ContaDoBanco (@field:NotNull val instituicao :String,
                     @field:NotNull val agencia :String,
                     @field:NotNull val numeroConta :String,
                     @field:NotNull val cpf :String,
-                    @field:NotNull val clientId:String   ) {
+                    @field:NotNull val clientId:String,
+                   ) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id : Long? = null
+
+    @OneToMany
+    val listaDeChaves : List<ChavePix>? = null
 }

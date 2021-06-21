@@ -34,15 +34,8 @@ class ChavePix (
 
     @ManyToOne
     var conta : ContaDoBanco?
-
-
-
 ){
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id : Long? = null
     val criadaEm:LocalDateTime = LocalDateTime.now()
-
-
-
-
 }

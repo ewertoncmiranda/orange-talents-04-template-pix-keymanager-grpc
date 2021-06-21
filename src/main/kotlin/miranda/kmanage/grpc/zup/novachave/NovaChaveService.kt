@@ -6,7 +6,7 @@ import miranda.kmanage.grpc.zup.NovaChaveResponse
 import miranda.kmanage.grpc.zup.chavepix.ChavePixRepositorio
 import miranda.kmanage.grpc.zup.conta.ContaDoBancoRepositorio
 import miranda.kmanage.grpc.zup.enum.TipoDaConta
-import miranda.kmanage.grpc.zup.exception.ChaveExistenteException
+import miranda.kmanage.grpc.zup.exception.ChaveJaCadastradaException
 import miranda.kmanage.grpc.zup.exception.ClienteNaoCadastradoNoBancoException
 import miranda.kmanage.grpc.zup.sistemasexternos.ItauBaseDeDados
 import javax.inject.Singleton
@@ -23,11 +23,10 @@ class NovaChaveService(
 
     @Transactional
     fun cadastrar(@Valid novaChavePix: NovaChavePix): NovaChaveResponse{
-        //verifica o tipo da chave e atribui uma string para passar como parametro para o cliente
-        val tipoConta = verificaConta(novaChavePix.conta!!)
 
-        //verifica no repositório se a chave já é cadastrada. Se sim, lança uma exceção
-        if(chavePixRepositorio.existsByChave(novaChavePix.chave!!)) throw ChaveExistenteException("Chave ${novaChavePix.chave}Já cadastrada")
+        val tipoConta = verificaTipoDaConta(novaChavePix.conta!!)
+
+        if(chavePixRepositorio.existsByChave(novaChavePix.chave!!)) throw ChaveJaCadastradaException("Chave ${novaChavePix.chave}Já cadastrada")
 
         //Busca no cliente erp do Itau um idCliente e um tipo de conta
         val response = baseDeDados.buscarCLientePorIdEConta(novaChavePix.clienteId!!,tipoConta)
@@ -38,9 +37,12 @@ class NovaChaveService(
         val conta = response.body()?.toModel()
 
         var chavepix = novaChavePix.toModel()
-        //Converte contaResponse para conta, salva conta e atribui o objeto de conta retornado
-        //pelo repositorio ao objeto de conta de chave pix
-        chavepix.conta = contaDoBancoRepositorio.save(conta)
+
+        if(!contaDoBancoRepositorio.existsByNumeroConta(conta!!.numeroConta)){
+            chavepix.conta = contaDoBancoRepositorio.save(conta)
+        }else{
+             chavepix.conta = contaDoBancoRepositorio.findByNumeroConta(conta.numeroConta).get()
+        }
 
         val chaveSalva = chavePixRepositorio.save(chavepix)
 
@@ -50,7 +52,7 @@ class NovaChaveService(
                                 .build()
     }
 
-    fun verificaConta(conta: TipoDaConta):String{
+    fun verificaTipoDaConta(conta: TipoDaConta):String{
         return when(conta){
             TipoDaConta.CONTA_POUPANCA -> "CONTA_POUPANCA"
             TipoDaConta.CONTA_CORRENTE->"CONTA_CORRENTE"

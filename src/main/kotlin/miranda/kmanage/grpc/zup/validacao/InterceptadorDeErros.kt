@@ -1,17 +1,17 @@
 package miranda.kmanage.grpc.zup.validacao
 
 import io.grpc.Status
-import io.grpc.StatusException
 import io.grpc.StatusRuntimeException
 import io.grpc.stub.StreamObserver
 import io.micronaut.aop.InterceptorBean
 import io.micronaut.aop.MethodInterceptor
 import io.micronaut.aop.MethodInvocationContext
 import io.micronaut.http.client.exceptions.HttpClientResponseException
-import miranda.kmanage.grpc.zup.exception.ChaveExistenteException
+import miranda.kmanage.grpc.zup.exception.ChaveJaCadastradaException
+import miranda.kmanage.grpc.zup.exception.ChaveNaoEncontradaException
+import miranda.kmanage.grpc.zup.exception.ChaveNaoPertenceAoUsuarioException
 import miranda.kmanage.grpc.zup.exception.ClienteNaoCadastradoNoBancoException
 import java.lang.Exception
-import java.lang.RuntimeException
 import javax.inject.Singleton
 import javax.validation.ConstraintViolationException
 import javax.validation.ValidationException
@@ -30,10 +30,12 @@ class InterceptadorDeErros :MethodInterceptor<Any,Any>{
 
             val status = when (e){
                 is ConstraintViolationException -> Status.INVALID_ARGUMENT.withCause(e).withDescription(e.message)
-                is ChaveExistenteException -> Status.ALREADY_EXISTS.withCause(e).withDescription(e.message)
+                is ChaveJaCadastradaException -> Status.INVALID_ARGUMENT.withCause(e).withDescription(e.message)
                 is HttpClientResponseException -> Status.NOT_FOUND.withCause(e).withDescription("Conta/Cliente não existe no banco.")
-                is ClienteNaoCadastradoNoBancoException -> Status.NOT_FOUND.withCause(e).withDescription(e.message)
+                is ClienteNaoCadastradoNoBancoException -> Status.INVALID_ARGUMENT.withCause(e).withDescription(e.message)
                 is ValidationException -> Status.INVALID_ARGUMENT.withCause(e).withDescription("ERRO NO FORMATO DO CPF")
+                is ChaveNaoEncontradaException ->Status.NOT_FOUND.withCause(e).withDescription("Chave Pix não encontrada!")
+                is ChaveNaoPertenceAoUsuarioException -> Status.NOT_FOUND.withCause(e).withDescription("Chave informada nao pertence ao usuario informado!")
                 else -> Status.INTERNAL.withDescription("Erro interno na aplicação.")
             }
 
