@@ -1,4 +1,4 @@
-package miranda.kmanage.grpc.zup.validacao
+package miranda.kmanage.grpc.zup.exception
 
 import io.micronaut.aop.Around
 

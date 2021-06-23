@@ -4,11 +4,13 @@ import io.micronaut.http.HttpStatus
 import io.micronaut.validation.Validated
 import miranda.kmanage.grpc.zup.NovaChaveResponse
 import miranda.kmanage.grpc.zup.chavepix.ChavePixRepositorio
-import miranda.kmanage.grpc.zup.conta.ContaDoBancoRepositorio
 import miranda.kmanage.grpc.zup.enum.TipoDaConta
 import miranda.kmanage.grpc.zup.exception.ChaveJaCadastradaException
 import miranda.kmanage.grpc.zup.exception.ClienteNaoCadastradoNoBancoException
 import miranda.kmanage.grpc.zup.sistemasexternos.ItauBaseDeDados
+import miranda.kmanage.grpc.zup.sistemasexternos.SistemaBancoCentralBrasil
+import org.slf4j.LoggerFactory
+import java.lang.Exception
 import javax.inject.Singleton
 import javax.transaction.Transactional
 import javax.validation.Valid
@@ -17,46 +19,37 @@ import javax.validation.Valid
 @Validated
 class NovaChaveService(
     private val chavePixRepositorio: ChavePixRepositorio,
-    private val baseDeDados: ItauBaseDeDados,
-    private val contaDoBancoRepositorio: ContaDoBancoRepositorio
+    private val itauBaseDeDados: ItauBaseDeDados,
+    private val bcbClient:SistemaBancoCentralBrasil
+
 ) {
+    //private val LOGGER = LoggerFactory.getLogger(this::class.java)
 
     @Transactional
     fun cadastrar(@Valid novaChavePix: NovaChavePix): NovaChaveResponse{
 
-        val tipoConta = verificaTipoDaConta(novaChavePix.conta!!)
+        if(chavePixRepositorio.existsByChave(novaChavePix.chave!!)) throw ChaveJaCadastradaException("Chave ${novaChavePix.chave} ja cadastrada")
 
-        if(chavePixRepositorio.existsByChave(novaChavePix.chave!!)) throw ChaveJaCadastradaException("Chave ${novaChavePix.chave}Já cadastrada")
+        //Busca no sistema do Itau um idCliente e um tipo de conta
+        val response = itauBaseDeDados.buscarCLientePorIdEConta(novaChavePix.clienteId!!,novaChavePix.tipoDeConta!!.name)
 
-        //Busca no cliente erp do Itau um idCliente e um tipo de conta
-        val response = baseDeDados.buscarCLientePorIdEConta(novaChavePix.clienteId!!,tipoConta)
-
-        //verifica se o cliente foi encontrado
+        //verifica se o cliente foi encontrado no sistema Itau
         if(response.status.code == HttpStatus.NOT_FOUND.code) { throw ClienteNaoCadastradoNoBancoException("Cliente não encontrado no banco.")}
 
-        val conta = response.body()?.toModel()
+        //recebe a conta vinda do erp itau , passa para novaChave.toModel e retorna uma ChavePix
+        var chavepix = novaChavePix.toModel(response.body()!!)
 
-        var chavepix = novaChavePix.toModel()
+        val resposta = bcbClient.cadastrar(chavepix.toBcbModel())
 
-        if(!contaDoBancoRepositorio.existsByNumeroConta(conta!!.numeroConta)){
-            chavepix.conta = contaDoBancoRepositorio.save(conta)
-        }else{
-             chavepix.conta = contaDoBancoRepositorio.findByNumeroConta(conta.numeroConta).get()
-        }
+        if (resposta.status.code != HttpStatus.CREATED.code){throw Exception("422 HttpStatus.UNPROCESSABLE_ENTITY.code")}
 
-        val chaveSalva = chavePixRepositorio.save(chavepix)
+        chavepix.chave =  resposta.body()!!.key
+        chavepix = chavePixRepositorio.save(chavepix)
 
         return NovaChaveResponse.newBuilder()
-                                .setClienteId(chaveSalva.clientId)
-                                .setIdPix(chaveSalva.chave)
-                                .build()
+                                .setClienteId(chavepix.clientId)
+                                .setIdPix(chavepix.chave).build()
+
     }
 
-    fun verificaTipoDaConta(conta: TipoDaConta):String{
-        return when(conta){
-            TipoDaConta.CONTA_POUPANCA -> "CONTA_POUPANCA"
-            TipoDaConta.CONTA_CORRENTE->"CONTA_CORRENTE"
-            else -> "-----ERRO---------"
-        }
     }
-}

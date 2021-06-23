@@ -1,4 +1,4 @@
-package miranda.kmanage.grpc.zup.validacao
+package miranda.kmanage.grpc.zup.exception
 
 import io.grpc.Status
 import io.grpc.StatusRuntimeException
@@ -7,10 +7,7 @@ import io.micronaut.aop.InterceptorBean
 import io.micronaut.aop.MethodInterceptor
 import io.micronaut.aop.MethodInvocationContext
 import io.micronaut.http.client.exceptions.HttpClientResponseException
-import miranda.kmanage.grpc.zup.exception.ChaveJaCadastradaException
-import miranda.kmanage.grpc.zup.exception.ChaveNaoEncontradaException
-import miranda.kmanage.grpc.zup.exception.ChaveNaoPertenceAoUsuarioException
-import miranda.kmanage.grpc.zup.exception.ClienteNaoCadastradoNoBancoException
+import miranda.kmanage.grpc.zup.exception.*
 import java.lang.Exception
 import javax.inject.Singleton
 import javax.validation.ConstraintViolationException
@@ -33,9 +30,9 @@ class InterceptadorDeErros :MethodInterceptor<Any,Any>{
                 is ChaveJaCadastradaException -> Status.INVALID_ARGUMENT.withCause(e).withDescription(e.message)
                 is HttpClientResponseException -> Status.NOT_FOUND.withCause(e).withDescription("Conta/Cliente não existe no banco.")
                 is ClienteNaoCadastradoNoBancoException -> Status.INVALID_ARGUMENT.withCause(e).withDescription(e.message)
-                is ValidationException -> Status.INVALID_ARGUMENT.withCause(e).withDescription("ERRO NO FORMATO DO CPF")
+                is ValidationException -> Status.INVALID_ARGUMENT.withCause(e).withDescription("Erro na validação de dados.")
                 is ChaveNaoEncontradaException ->Status.NOT_FOUND.withCause(e).withDescription("Chave Pix não encontrada!")
-                is ChaveNaoPertenceAoUsuarioException -> Status.NOT_FOUND.withCause(e).withDescription("Chave informada nao pertence ao usuario informado!")
+                is ChaveNaoPertenceAoUsuarioException -> Status.INVALID_ARGUMENT.withCause(e).withDescription("Chave informada nao pertence ao usuario informado!")
                 else -> Status.INTERNAL.withDescription("Erro interno na aplicação.")
             }
 

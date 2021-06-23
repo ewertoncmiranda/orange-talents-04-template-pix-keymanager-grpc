@@ -7,19 +7,17 @@ import javax.persistence.*
 import javax.validation.constraints.NotNull
 
 
-@Entity
-class ContaDoBanco (@field:NotNull val instituicao :String,
-                    @Enumerated(EnumType.STRING) val tipo: TipoDaConta,
-                    @field:NotNull val titular :String,
-                    @field:NotNull val agencia :String,
-                    @field:NotNull val numeroConta :String,
-                    @field:NotNull val cpf :String,
-                    @field:NotNull val clientId:String,
-                   ) {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id : Long? = null
+@Embeddable
+class ContaDoBanco (
+    @field:NotNull val instituicao :String,
+    @field:NotNull val nomeDoTitular :String,
+    @field:NotNull val agencia :String,
+    @field:NotNull val numeroConta :String,
+    @Column(name = "conta_titular_cpf", length = 11, nullable = false)
+    @field:NotNull val cpf :String
+    ) {
+    companion object {
+        public val ITAU_UNIBANCO_ISPB: String = "60701190"
+    }
 
-    @OneToMany
-    val listaDeChaves : List<ChavePix>? = null
 }

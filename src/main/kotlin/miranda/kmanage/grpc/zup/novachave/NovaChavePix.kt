@@ -4,8 +4,10 @@ import io.micronaut.core.annotation.Introspected
 import miranda.kmanage.grpc.zup.TipoChave
 import miranda.kmanage.grpc.zup.TipoConta
 import miranda.kmanage.grpc.zup.chavepix.ChavePix
+import miranda.kmanage.grpc.zup.conta.ContaDoBanco
 import miranda.kmanage.grpc.zup.enum.TipoDaConta
 import miranda.kmanage.grpc.zup.enum.TipoDeChave
+import miranda.kmanage.grpc.zup.sistemasexternos.itaudto.ContaCompletaResponse
 import miranda.kmanage.grpc.zup.validacao.ValidarChave
 import miranda.kmanage.grpc.zup.validacao.ValidarUUID
 import java.util.*
@@ -21,22 +23,20 @@ data class NovaChavePix (@field:NotBlank @ValidarUUID
                          val clienteId:String?,
 
                          @Enumerated(EnumType.STRING)
-                         val tipo:TipoDeChave?,
+                         val tipoDeChave:TipoDeChave?,
 
                          @field:NotNull
                          @field:Size(max = 77)
                          val chave:String?,
 
                          @Enumerated(EnumType.STRING)
-                         var conta:TipoDaConta?
+                         var tipoDeConta:TipoDaConta?
   ){
- fun toModel():ChavePix{
+ fun toModel(c: ContaCompletaResponse):ChavePix{
 
-     val valorChave = when(tipo){
-                        TipoDeChave.ALEATORIO-> UUID.randomUUID().toString()
-                        else -> chave
-     }
-     return ChavePix(clienteId!!,tipo!!,valorChave!!,conta!!,null)
+     val conta = ContaDoBanco(c.instituicao.nome,c.titular.nome ,c.agencia,c.numero,c.titular.cpf)
+
+     return ChavePix(c.titular.id,tipoDeChave!!,chave!!,tipoDeConta!!,conta)
 
  }
 

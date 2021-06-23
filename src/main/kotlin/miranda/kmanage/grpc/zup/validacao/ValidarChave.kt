@@ -23,9 +23,9 @@ class ValidadorDeChavePix(): ConstraintValidator<ValidarChave, NovaChavePix> {
     override fun isValid(value: NovaChavePix?,
                          context: ConstraintValidatorContext?): Boolean {
 
-        if(value?.tipo == null) return false
+        if(value?.tipoDeChave == null) return false
 
-        return value.tipo.valida(value.chave)
+        return value.tipoDeChave.valida(value.chave)
 
     }
 

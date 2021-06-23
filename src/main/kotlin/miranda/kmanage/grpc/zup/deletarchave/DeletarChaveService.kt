@@ -1,35 +1,44 @@
 package miranda.kmanage.grpc.zup.deletarchave
 
+import io.micronaut.http.HttpStatus
 import io.micronaut.validation.Validated
 import miranda.kmanage.grpc.zup.chavepix.ChavePixRepositorio
-import miranda.kmanage.grpc.zup.exception.ChaveNaoEncontradaException
-import miranda.kmanage.grpc.zup.exception.ChaveNaoPertenceAoUsuarioException
-import miranda.kmanage.grpc.zup.exception.ClienteNaoCadastradoNoBancoException
-import miranda.kmanage.grpc.zup.exception.MinhaException
+import miranda.kmanage.grpc.zup.exception.*
+import miranda.kmanage.grpc.zup.sistemasexternos.SistemaBancoCentralBrasil
+import miranda.kmanage.grpc.zup.sistemasexternos.bcbdto.DeletePixKeyRequest
 import miranda.kmanage.grpc.zup.validacao.ValidarUUID
+import javax.inject.Inject
 import javax.inject.Singleton
 import javax.validation.constraints.NotNull
 
 
 @Singleton
 @Validated
-class DeletarChaveService( val repositorio: ChavePixRepositorio) {
+class DeletarChaveService(@Inject val repositorio: ChavePixRepositorio,
+                          @Inject val bancoCentralBrasil: SistemaBancoCentralBrasil) {
 
-    fun deleta(@ValidarUUID @NotNull idPix:Long ,
-               @ValidarUUID @NotNull idCliente:String): Boolean{
+    fun deleta( @NotNull idPix:Long ,
+                @NotNull idCliente:String): Boolean{
 
         if(!repositorio.existsById(idPix)){
             throw ChaveNaoEncontradaException("Chave Pix não encontrada!")
         }
 
-        val chaveResponse = repositorio.buscarPorIdEChave(idPix,idCliente)
+        val chave = repositorio.buscarPorIdEChave(idPix,idCliente)
 
-        return if(chaveResponse.isPresent){
-                 repositorio.deleteById(idPix)
-                 true
-             }else {
-                throw ChaveNaoPertenceAoUsuarioException("Chave informada nao pertence ao usuario informado!")
-                false
-             }
+        if(chave.isEmpty) { throw ChaveNaoPertenceAoUsuarioException("Chave informada nao pertence ao usuario informado!")}
+
+        val chaveResponse = chave.get().chave
+
+        val response = bancoCentralBrasil.delete(DeletePixKeyRequest
+                                                (chaveResponse,
+                                                "60701190"),chaveResponse)
+
+        return if(response.status == HttpStatus.OK){
+                    repositorio.deleteById(idPix)
+                    true
+                }else {
+                    throw ErroAoDeletarChaveNoBcbException("Erro ao deletar chave no BCB!")
+                }
     }
 }
