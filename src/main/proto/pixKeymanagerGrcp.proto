@@ -10,44 +10,76 @@ package miranda.kmanage.grpc.zup;
 service PixKeymanagerService {
   rpc cadastra (NovaChaveRequester) returns (NovaChaveResponse) {}
 }
+service CarregaChaveService{
+  rpc consulta(CarregaChaveRequester) returns (CarregaChaveResponse){}
+}
 
 service DeletarChaveService{
   rpc exclui(DeletaChaveRequester) returns (DeletaChaveResponse){}
 }
 
+message CarregaChaveRequester{
+  message FiltroPorPixId{
+    string idCliente    = 1 ;
+    int64 pixId         = 2;
+  }
+  oneof filtro{
+    FiltroPorPixId pixId = 1;
+    string chave         = 2 ;
+  }
+}
+
+message CarregaChaveResponse{
+  message ContaInfo{
+    TipoConta tipo        = 1 ;
+    string instituicao    = 2 ;
+    string nomeDoTitular  = 3;
+    string cpf            = 4 ;
+    string agencia        = 5 ;
+    string numeroConta    = 6 ;
+  }
+  TipoChave tpoChave      = 1;
+  string chave            = 2 ;
+  ContaInfo contaInfo     = 3;
+  string criadaEm         =4;
+}
+
+message ConsultaChaveResponse{
+  string nome             = 1 ;
+  string cpf              = 2;
+}
 
 message NovaChaveRequester{
-  string iDcliente = 1 ;
-  TipoConta tipoConta = 2  ;
-  TipoChave tipoChave = 3 ;
-  string chave = 4 ;
+  string iDcliente        = 1 ;
+  TipoConta tipoConta     = 2  ;
+  TipoChave tipoChave     = 3 ;
+  string chave            = 4 ;
 }
 message NovaChaveResponse {
-  string idPix = 1;
-  string clienteId = 2 ;
+  string idPix      = 1;
+  string clienteId  = 2 ;
 }
 
 message DeletaChaveResponse{
-bool deletado = 1 ;
+bool deletado     = 1 ;
 }
 
 message DeletaChaveRequester{
-int64  idPix = 1;
-string clienteId=2;
+int64  idPix      = 1;
+string clienteId  =2;
 }
-
 
 
 enum TipoChave {
-  UNKNOWN= 0;
-  CPF = 1;
-  CELULAR = 2;
-  EMAIL = 3;
-  ALEATORIO = 4;
+  UNKNOWN     = 0;
+  CPF         = 1;
+  CELULAR     = 2;
+  EMAIL       = 3;
+  ALEATORIO   = 4;
 }
 
 enum TipoConta{
-  NULA = 0 ;
-  CONTA_CORRENTE = 1;
-  CONTA_POUPANCA = 2 ;
+  NULA            = 0 ;
+  CONTA_CORRENTE  = 1;
+  CONTA_POUPANCA  = 2 ;
 }

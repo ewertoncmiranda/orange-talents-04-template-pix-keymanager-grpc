@@ -38,7 +38,7 @@ class ChavePix (
 
     fun toBcbModel():CreatePixKeyRequest{
         val bank_acc = BankAccount("60701190",conta!!.agencia,conta!!.numeroConta,tipoConta.toBcbType())
-        val owner = Owner(Type.NATURAL_PERSON,conta!!.nomeDoTitular,conta!!.cpf,)
-       return CreatePixKeyRequest(tipoDaChave.toBcbType() ,chave,owner,bank_acc)
+        val owner = Owner(Type.NATURAL_PERSON,conta!!.nomeDoTitular,conta!!.cpf)
+        return CreatePixKeyRequest(tipoDaChave.toBcbType() ,chave,owner,bank_acc)
     }
 }

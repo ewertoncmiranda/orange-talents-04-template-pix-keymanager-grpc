@@ -14,8 +14,8 @@ import javax.validation.constraints.NotNull
 
 @Singleton
 @Validated
-class DeletarChaveService(@Inject val repositorio: ChavePixRepositorio,
-                          @Inject val bancoCentralBrasil: SistemaBancoCentralBrasil) {
+class DeletarChaveService(@Inject @field:NotNull val repositorio: ChavePixRepositorio,
+                          @Inject @field:NotNull val bancoCentralBrasil: SistemaBancoCentralBrasil) {
 
     fun deleta( @NotNull idPix:Long ,
                 @NotNull idCliente:String): Boolean{

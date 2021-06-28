@@ -1,4 +1,4 @@
-package miranda.kmanage.grpc.zup.uti
+package miranda.kmanage.grpc.zup.util
 
 import miranda.kmanage.grpc.zup.DeletaChaveRequester
 import miranda.kmanage.grpc.zup.NovaChaveRequester
@@ -13,10 +13,10 @@ fun NovaChaveRequester.toModel(): NovaChavePix {
          chave = chave,
          clienteId =  iDcliente,
          tipoDeChave = when(tipoChave){
-            TipoChave.CELULAR ->TipoDeChave.CELULAR
-            TipoChave.CPF->TipoDeChave.CPF
-            TipoChave.ALEATORIO ->TipoDeChave.ALEATORIO
-            TipoChave.EMAIL->TipoDeChave.EMAIL
+            TipoChave.CELULAR ->TipoDeChave.valueOf(tipoChave.name)
+            TipoChave.CPF->TipoDeChave.valueOf(tipoChave.name)
+            TipoChave.ALEATORIO ->TipoDeChave.valueOf(tipoChave.name)
+            TipoChave.EMAIL->TipoDeChave.valueOf(tipoChave.name)
             else -> null
         },
         tipoDeConta =   when(tipoConta){

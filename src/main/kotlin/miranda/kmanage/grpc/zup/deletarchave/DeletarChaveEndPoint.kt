@@ -15,8 +15,8 @@ class DeletarChaveEndPoint (@Inject val deleteService: DeletarChaveService):Dele
     override fun exclui(request: DeletaChaveRequester?, responseObserver: StreamObserver<DeletaChaveResponse>?) {
 
         responseObserver!!.onNext(DeletaChaveResponse.newBuilder()
-                          .setDeletado(deleteService.deleta(request!!.idPix,request.clienteId))
-                          .build())
+                                  .setDeletado(deleteService.deleta(request!!.idPix,request.clienteId))
+                                  .build())
         responseObserver.onCompleted()
 
     }

@@ -27,12 +27,13 @@ class InterceptadorDeErros :MethodInterceptor<Any,Any>{
 
             val status = when (e){
                 is ConstraintViolationException -> Status.INVALID_ARGUMENT.withCause(e).withDescription(e.message)
-                is ChaveJaCadastradaException -> Status.INVALID_ARGUMENT.withCause(e).withDescription(e.message)
+                is ChaveJaCadastradaException -> Status.ALREADY_EXISTS.withCause(e).withDescription(e.message)
                 is HttpClientResponseException -> Status.NOT_FOUND.withCause(e).withDescription("Conta/Cliente não existe no banco.")
-                is ClienteNaoCadastradoNoBancoException -> Status.INVALID_ARGUMENT.withCause(e).withDescription(e.message)
+                is ClienteNaoCadastradoNoBancoException -> Status.NOT_FOUND.withCause(e).withDescription(e.message)
                 is ValidationException -> Status.INVALID_ARGUMENT.withCause(e).withDescription("Erro na validação de dados.")
                 is ChaveNaoEncontradaException ->Status.NOT_FOUND.withCause(e).withDescription("Chave Pix não encontrada!")
-                is ChaveNaoPertenceAoUsuarioException -> Status.INVALID_ARGUMENT.withCause(e).withDescription("Chave informada nao pertence ao usuario informado!")
+                is ChaveNaoPertenceAoUsuarioException -> Status.FAILED_PRECONDITION.withCause(e).withDescription("Chave informada nao pertence ao usuario informado!")
+                is FalhaAoRegistrarNoBcbException ->Status.FAILED_PRECONDITION.withCause(e).withDescription(e.message)
                 else -> Status.INTERNAL.withDescription("Erro interno na aplicação.")
             }
 

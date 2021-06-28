@@ -7,6 +7,7 @@ import miranda.kmanage.grpc.zup.chavepix.ChavePixRepositorio
 import miranda.kmanage.grpc.zup.enum.TipoDaConta
 import miranda.kmanage.grpc.zup.exception.ChaveJaCadastradaException
 import miranda.kmanage.grpc.zup.exception.ClienteNaoCadastradoNoBancoException
+import miranda.kmanage.grpc.zup.exception.FalhaAoRegistrarNoBcbException
 import miranda.kmanage.grpc.zup.sistemasexternos.ItauBaseDeDados
 import miranda.kmanage.grpc.zup.sistemasexternos.SistemaBancoCentralBrasil
 import org.slf4j.LoggerFactory
@@ -23,9 +24,6 @@ class NovaChaveService(
     private val bcbClient:SistemaBancoCentralBrasil
 
 ) {
-    //private val LOGGER = LoggerFactory.getLogger(this::class.java)
-
-    @Transactional
     fun cadastrar(@Valid novaChavePix: NovaChavePix): NovaChaveResponse{
 
         if(chavePixRepositorio.existsByChave(novaChavePix.chave!!)) throw ChaveJaCadastradaException("Chave ${novaChavePix.chave} ja cadastrada")
@@ -39,9 +37,15 @@ class NovaChaveService(
         //recebe a conta vinda do erp itau , passa para novaChave.toModel e retorna uma ChavePix
         var chavepix = novaChavePix.toModel(response.body()!!)
 
-        val resposta = bcbClient.cadastrar(chavepix.toBcbModel())
+        val teste = chavepix.toBcbModel()
 
-        if (resposta.status.code != HttpStatus.CREATED.code){throw Exception("422 HttpStatus.UNPROCESSABLE_ENTITY.code")}
+        println(teste)
+
+        val resposta = bcbClient.cadastrar(teste)
+
+        if (resposta.status.code != HttpStatus.CREATED.code){
+            throw FalhaAoRegistrarNoBcbException("Erro ao registrar a chave no Banco Central.")
+        }
 
         chavepix.chave =  resposta.body()!!.key
         chavepix = chavePixRepositorio.save(chavepix)

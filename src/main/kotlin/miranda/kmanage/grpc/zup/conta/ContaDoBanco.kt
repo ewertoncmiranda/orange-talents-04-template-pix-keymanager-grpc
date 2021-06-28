@@ -6,7 +6,6 @@ import java.time.LocalDateTime
 import javax.persistence.*
 import javax.validation.constraints.NotNull
 
-
 @Embeddable
 class ContaDoBanco (
     @field:NotNull val instituicao :String,
