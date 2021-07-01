@@ -8,6 +8,8 @@ import java.util.*
 @Repository
 interface ChavePixRepositorio:CrudRepository<ChavePix,Long> {
 
+   fun findAllByClientId(clientId: String):List<ChavePix>
+
    fun findByChave(chave: String):Optional<ChavePix>
 
    fun existsByChave(chave:String):Boolean

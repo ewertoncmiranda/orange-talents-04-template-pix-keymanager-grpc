@@ -23,6 +23,10 @@ service CarregaChaveBcbService{
   rpc consulta(CarregaChaveBcbRequester) returns (CarregaDadosBcbResponse){}
 }
 
+service ListaTodasChavesClientService{
+  rpc listar(ListaChavesPixRequest) returns (ListaChavesPixResponse){}
+}
+
 message CarregaChaveBcbRequester{
   string chave      =1;
 }
@@ -88,7 +92,22 @@ message DeletaChaveRequester{
 int64  idPix      =1;
 string clienteId  =2;
 }
+/*Lista Todas as Chaves do cliente*/
+message ListaChavesPixRequest{
+  string clientId = 1 ;
+}
 
+message ListaChavesPixResponse{
+  message ChavePix{
+    string pixId = 1;
+    TipoChave tipoChave = 2 ;
+    string chave = 3 ;
+    TipoConta tipoConta = 4 ;
+    string criadaEm = 5 ;
+  }
+  string clientId = 1;
+  repeated ChavePix  listaDeChaves= 2;
+}
 
 enum TipoChave {
   UNKNOWN     = 0;
