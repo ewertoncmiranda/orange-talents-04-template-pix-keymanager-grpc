@@ -5,7 +5,9 @@ import miranda.kmanage.grpc.zup.enum.TipoDaConta
 import miranda.kmanage.grpc.zup.enum.TipoDeChave
 import miranda.kmanage.grpc.zup.sistemasexternos.bcbdto.*
 import java.time.LocalDateTime
+import java.util.*
 import javax.persistence.*
+import javax.validation.Valid
 import javax.validation.constraints.NotNull
 
 @Entity
@@ -30,6 +32,7 @@ class ChavePix (
     val tipoConta:TipoDaConta ,
 
     @Embedded
+    @field:Valid
     var conta : ContaDoBanco?
 ){
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

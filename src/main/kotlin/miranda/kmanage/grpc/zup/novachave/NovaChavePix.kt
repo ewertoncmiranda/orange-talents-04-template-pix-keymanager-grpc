@@ -19,7 +19,7 @@ import javax.validation.constraints.Size
 
 @Introspected
 @ValidarChave
-data class NovaChavePix (@field:NotBlank @ValidarUUID
+data class NovaChavePix (@field:NotNull @ValidarUUID
                          val clienteId:String?,
 
                          @Enumerated(EnumType.STRING)

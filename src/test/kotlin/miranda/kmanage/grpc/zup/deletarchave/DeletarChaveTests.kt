@@ -29,7 +29,8 @@ import javax.inject.Inject
 @MicronautTest(transactional = false)
 class DeletarChaveTests (
             val grpc:DeletarChaveServiceGrpc.DeletarChaveServiceBlockingStub,
-            val repositorio: ChavePixRepositorio){
+            val repositorio: ChavePixRepositorio
+            ){
 
     /*Variaveis e Funções de Mockagem*/
     @field:Inject
@@ -82,7 +83,7 @@ class DeletarChaveTests (
         Mockito.`when`(bcbCliente.delete(deletePixKeyRequest(),CHAVE_EXISTENTE.chave))
             .thenReturn(HttpResponse.ok(""))
         val response = grpc.exclui(DeletaChaveRequester.newBuilder()
-                        .setClienteId(CHAVE_EXISTENTE.clientId)
+                        .setClienteId(CHAVE_EXISTENTE.clientId.toString())
                         .setIdPix(CHAVE_EXISTENTE.id!!).build())
 
         Assertions.assertTrue(response.deletado)
@@ -98,7 +99,7 @@ class DeletarChaveTests (
             .thenReturn(HttpResponse.badRequest())
 
         val response = assertThrows<StatusRuntimeException> {grpc.exclui(DeletaChaveRequester.newBuilder()
-                                .setClienteId(CHAVE_EXISTENTE.clientId)
+                                .setClienteId(CHAVE_EXISTENTE.clientId.toString())
                                 .setIdPix(CHAVE_EXISTENTE.id!!).build())
         }
 
@@ -110,7 +111,7 @@ class DeletarChaveTests (
     @Test
     fun nao_deve_excluir_quando_chave_nao_existe(){
         val response = assertThrows<StatusRuntimeException> {grpc.exclui(DeletaChaveRequester.newBuilder()
-            .setClienteId(CHAVE_EXISTENTE.clientId)
+            .setClienteId(CHAVE_EXISTENTE.clientId.toString())
             .setIdPix(2L).build())
         }
 
@@ -120,7 +121,7 @@ class DeletarChaveTests (
     }
 
     @Test
-    fun nao_deve_excluir_chaveexiste_mas_nao_pertence_cliente(){
+    fun nao_deve_excluir_se_chaveexiste_mas_nao_pertence_cliente(){
         repositorio.save(ChavePix(
             tipoDaChave = TipoDeChave.EMAIL,
             chave = "tomas_bola@gmail.com",
@@ -141,7 +142,8 @@ class DeletarChaveTests (
     }
 
 
-    /*Funções de objetos para serem usados nos testes*/
+
+    /*Funções que retornam objetos para serem usados nos testes*/
     fun createPixKeyRequester(): CreatePixKeyRequest {
         return CreatePixKeyRequest(
             KeyType.CPF,"02467781054",

@@ -87,7 +87,7 @@ internal class NovaChaveEndPointTests(val grpc: PixKeymanagerServiceGrpc.PixKeym
 
     @Test
     fun nao_deve_registrar_uma_chave_quando_chave_existir(){
-        repositorio.save(ChavePix("",TipoDeChave.CPF,"13319881795",TipoDaConta.CONTA_CORRENTE,
+        repositorio.save(ChavePix(UUID.randomUUID().toString(),TipoDeChave.CPF,"13319881795",TipoDaConta.CONTA_CORRENTE,
                         ContaDoBanco("","","","","13319881795")
         ))
 
@@ -174,8 +174,8 @@ internal class NovaChaveEndPointTests(val grpc: PixKeymanagerServiceGrpc.PixKeym
         }
     }
 
-    fun createPixKeyResponse():CreatePixKeyResponse{
-        return CreatePixKeyResponse(KeyType.CPF,"13319881795",
+    fun createPixKeyResponse():PixKeyDetailsResponse{
+        return PixKeyDetailsResponse(KeyType.CPF,"13319881795",
             Owner(Type.NATURAL_PERSON,"Rafael M C Ponte","c56dfef4-7901-44fb-84e2-a2cefb157890"),
             BankAccount("60701190","0001","291900",AccountType.CACC),"789456")
     }
@@ -189,7 +189,8 @@ internal class NovaChaveEndPointTests(val grpc: PixKeymanagerServiceGrpc.PixKeym
 
     fun contaCompletaResponse():ContaCompletaResponse{
         return  ContaCompletaResponse("CONTA_CORRENTE","0001","291900",
-                TitularResponse("c56dfef4-7901-44fb-84e2-a2cefb157890",
+                TitularResponse(
+                                "c56dfef4-7901-44fb-84e2-a2cefb157890",
                                 "Rafael M C Ponte",
                                 "02467781054"),
                 InstituicaoResponse("ITAÚ UNIBANCO S.A","60701190")

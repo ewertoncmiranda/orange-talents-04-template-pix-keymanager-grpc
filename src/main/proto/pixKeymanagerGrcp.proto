@@ -10,38 +10,58 @@ package miranda.kmanage.grpc.zup;
 service PixKeymanagerService {
   rpc cadastra (NovaChaveRequester) returns (NovaChaveResponse) {}
 }
-service CarregaChaveService{
-  rpc consulta(CarregaChaveRequester) returns (CarregaChaveResponse){}
-}
 
 service DeletarChaveService{
   rpc exclui(DeletaChaveRequester) returns (DeletaChaveResponse){}
 }
 
-message CarregaChaveRequester{
-  message FiltroPorPixId{
-    string idCliente    = 1 ;
-    int64 pixId         = 2;
-  }
-  oneof filtro{
-    FiltroPorPixId pixId = 1;
-    string chave         = 2 ;
-  }
+service CarregaChaveInternoService{
+  rpc consulta(CarregaChaveInternoRequester) returns (CarregaDadosInternoResponse){}
 }
 
-message CarregaChaveResponse{
+service CarregaChaveBcbService{
+  rpc consulta(CarregaChaveBcbRequester) returns (CarregaDadosBcbResponse){}
+}
+
+message CarregaChaveBcbRequester{
+  string chave      =1;
+}
+
+message CarregaChaveInternoRequester{
+  string idPix      =1;
+  string idClient   =2;
+}
+
+message CarregaDadosInternoResponse{
+    message ContaInfo{
+      TipoConta tipoConta   = 1 ;
+      string instituicao    = 2 ;
+      string nomeDoTitular  = 3;
+      string cpf            = 4 ;
+      string agencia        = 5 ;
+      string numeroConta    = 6 ;
+    }
+  TipoChave tipoChave     = 1;
+  string chave            = 2 ;
+  ContaInfo contaInfo     = 3;
+  string criadaEm         = 4 ;
+  string pixId            = 5 ;
+  string clientId         = 6 ;
+}
+
+message CarregaDadosBcbResponse{
   message ContaInfo{
-    TipoConta tipo        = 1 ;
+    TipoConta tipoConta   = 1 ;
     string instituicao    = 2 ;
     string nomeDoTitular  = 3;
     string cpf            = 4 ;
     string agencia        = 5 ;
     string numeroConta    = 6 ;
   }
-  TipoChave tpoChave      = 1;
+  TipoChave tipoChave     = 1;
   string chave            = 2 ;
   ContaInfo contaInfo     = 3;
-  string criadaEm         =4;
+  string criadaEm         = 4 ;
 }
 
 message ConsultaChaveResponse{
@@ -65,7 +85,7 @@ bool deletado     = 1 ;
 }
 
 message DeletaChaveRequester{
-int64  idPix      = 1;
+int64  idPix      =1;
 string clienteId  =2;
 }
 

@@ -1,5 +1,6 @@
 package miranda.kmanage.grpc.zup.novachave
 
+import io.micronaut.http.HttpResponse
 import io.micronaut.http.HttpStatus
 import io.micronaut.validation.Validated
 import miranda.kmanage.grpc.zup.NovaChaveResponse
@@ -29,7 +30,7 @@ class NovaChaveService(
         if(chavePixRepositorio.existsByChave(novaChavePix.chave!!)) throw ChaveJaCadastradaException("Chave ${novaChavePix.chave} ja cadastrada")
 
         //Busca no sistema do Itau um idCliente e um tipo de conta
-        val response = itauBaseDeDados.buscarCLientePorIdEConta(novaChavePix.clienteId!!,novaChavePix.tipoDeConta!!.name)
+        val response = itauBaseDeDados.buscarCLientePorIdEConta(novaChavePix.clienteId.toString(),novaChavePix.tipoDeConta!!.name)
 
         //verifica se o cliente foi encontrado no sistema Itau
         if(response.status.code == HttpStatus.NOT_FOUND.code) { throw ClienteNaoCadastradoNoBancoException("Cliente não encontrado no banco.")}
@@ -38,8 +39,6 @@ class NovaChaveService(
         var chavepix = novaChavePix.toModel(response.body()!!)
 
         val teste = chavepix.toBcbModel()
-
-        println(teste)
 
         val resposta = bcbClient.cadastrar(teste)
 
@@ -51,7 +50,7 @@ class NovaChaveService(
         chavepix = chavePixRepositorio.save(chavepix)
 
         return NovaChaveResponse.newBuilder()
-                                .setClienteId(chavepix.clientId)
+                                .setClienteId(chavepix.clientId.toString())
                                 .setIdPix(chavepix.chave).build()
 
     }
