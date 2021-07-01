@@ -26,9 +26,9 @@ import javax.inject.Inject
 
 @MicronautTest(transactional = false)
 class ConsultaInternaTests (
-                val grpc:CarregaChaveInternoServiceGrpc.CarregaChaveInternoServiceBlockingStub,
-                val repositorio: ChavePixRepositorio
-                ){
+            val grpc:CarregaChaveInternoServiceGrpc.CarregaChaveInternoServiceBlockingStub,
+            val repositorio: ChavePixRepositorio
+            ){
 
     /*Criação de variaveis e funções de mocking*/
     @field:Inject

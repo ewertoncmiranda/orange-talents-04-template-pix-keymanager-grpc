@@ -5,10 +5,12 @@ import miranda.kmanage.grpc.zup.ListaChavesPixRequest
 import miranda.kmanage.grpc.zup.ListaChavesPixResponse
 import miranda.kmanage.grpc.zup.ListaTodasChavesClientServiceGrpc
 import miranda.kmanage.grpc.zup.chavepix.ChavePixRepositorio
+import miranda.kmanage.grpc.zup.exception.ErrorGeralHandler
 import java.lang.IllegalArgumentException
 import javax.inject.Singleton
 
 @Singleton
+@ErrorGeralHandler
 class ListaChaveEndPoint(val repositorio: ChavePixRepositorio)
                 :ListaTodasChavesClientServiceGrpc.ListaTodasChavesClientServiceImplBase() {
 
@@ -18,7 +20,7 @@ class ListaChaveEndPoint(val repositorio: ChavePixRepositorio)
     ) {
 
     if(request.clientId.isNullOrBlank()){
-        throw IllegalArgumentException("Clienta não pode ser nulo ou vazio!")
+        throw IllegalArgumentException("Id do Cliente não pode ser nulo ou vazio!")
     }
 
         val clientId = request.clientId

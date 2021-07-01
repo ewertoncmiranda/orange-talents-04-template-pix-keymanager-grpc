@@ -9,6 +9,7 @@ import io.micronaut.aop.MethodInvocationContext
 import io.micronaut.http.client.exceptions.HttpClientResponseException
 import miranda.kmanage.grpc.zup.exception.*
 import java.lang.Exception
+import java.lang.IllegalArgumentException
 import javax.inject.Singleton
 import javax.validation.ConstraintViolationException
 import javax.validation.ValidationException
@@ -34,6 +35,7 @@ class InterceptadorDeErros :MethodInterceptor<Any,Any>{
                 is ChaveNaoEncontradaException ->Status.NOT_FOUND.withCause(e).withDescription("Chave Pix não encontrada!")
                 is ChaveNaoPertenceAoUsuarioException -> Status.FAILED_PRECONDITION.withCause(e).withDescription("Chave informada nao pertence ao usuario informado!")
                 is FalhaAoRegistrarNoBcbException ->Status.FAILED_PRECONDITION.withCause(e).withDescription(e.message)
+                is IllegalArgumentException -> Status.INVALID_ARGUMENT.withCause(e).withDescription(e.message)
                 else -> Status.INTERNAL.withDescription("Erro interno na aplicação.")
             }
 
